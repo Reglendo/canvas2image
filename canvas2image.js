@@ -41,8 +41,21 @@
 		return canvas.toDataURL(type);
 	}
 
-	function saveFile (strData) {
-		document.location.href = strData;
+	// function saveFile (strData) {
+	// 	document.location.href = strData;
+	// }
+
+	function saveFile(uri, filename = 'default.png') {
+		var link = document.createElement('a');
+		if (typeof link.download === 'string') {
+			document.body.appendChild(link); // Firefox requires the link to be in the body
+			link.download = filename;
+			link.href = uri;
+			link.click();
+			document.body.removeChild(link); // remove the link when done
+		} else {
+			location.replace(uri);
+		}
 	}
 
 	function fixType (type) {
@@ -59,26 +72,27 @@
 	 * @param {Number} [optional] png width
 	 * @param {Number} [optional] png height
 	 */
-	var saveAsImage = function (canvas, width, height, type) {
+	var saveAsImage = function (canvas, width, height, type,filename) {
 		if ($support.canvas && $support.dataURL) {
 			if (typeof canvas == "string") { canvas = document.getElementById(canvas); }
 			if (type == undefined) { type = 'png'; }
+			var extension = type
 			type = fixType(type);
 			var strData = getDataURL(canvas, type, width, height);
-			saveFile(strData.replace(type, downloadMime));
+			saveFile(strData.replace(type, downloadMime),filename+'.'+extension);
 		}
 	};
 
 
 export default {
 	saveAsImage: saveAsImage,
-	saveAsPNG: function (canvas, width, height) {
-		return saveAsImage(canvas, width, height, 'png');
+	saveAsPNG: function (canvas, filename, width, height) {
+		return saveAsImage(canvas, width, height, 'png', filename);
 	},
-	saveAsJPEG: function (canvas, width, height) {
-		return saveAsImage(canvas, width, height, 'jpeg');
+	saveAsJPEG: function (canvas, filename, width, height) {
+		return saveAsImage(canvas, width, height, 'jpeg', filename);
 	},
-	saveAsGIF: function (canvas, width, height) {
-		return saveAsImage(canvas, width, height, 'gif');
+	saveAsGIF: function (canvas, filename, width, height) {
+		return saveAsImage(canvas, width, height, 'gif', filename);
 	},
 };
